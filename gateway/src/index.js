@@ -15,7 +15,21 @@ function setupHandlers(app) {
     // Main web page that lists videos.
     //
     app.get("/", (req, res) => {
-        http.request( // Get the list of videos from the metadata microservice.
+        http.request( 
+            {
+                host: `video-advertising`,
+                path: `/`,
+                method: `GET`,
+            },
+            (response) => {
+                let ads = "";
+                response.on("data", chunk => {
+                    ads += chunk;
+                });
+
+                response.on("end", () => {
+                    // Renders the video list for display in the browser.
+                    http.request( // Get the list of videos from the metadata microservice.
             {
                 host: `metadata`,
                 path: `/videos`,
@@ -29,7 +43,16 @@ function setupHandlers(app) {
 
                 response.on("end", () => {
                     // Renders the video list for display in the browser.
-                    res.render("video-list", { videos: JSON.parse(data).videos });
+                    res.render("video-list", { videos: JSON.parse(data).videos, advertising: JSON.parse(ads)});
+                });
+
+                response.on("error", err => {
+                    console.error("Failed to get video list.");
+                    console.error(err || `Status code: ${response.statusCode}`);
+                    res.sendStatus(500);
+                });
+            }
+            ).end();
                 });
 
                 response.on("error", err => {
@@ -89,7 +112,21 @@ function setupHandlers(app) {
     // Web page to show the users viewing history.
     //
     app.get("/history", (req, res) => {
-        http.request( // Gets the viewing history from the history microservice.
+        http.request( 
+            {
+                host: `video-advertising`,
+                path: `/`,
+                method: `GET`,
+            },
+            (response) => {
+                let ads = "";
+                response.on("data", chunk => {
+                    ads += chunk;
+                });
+
+                response.on("end", () => {
+                    // Renders the video list for display in the browser.
+                    http.request( // Gets the viewing history from the history microservice.
             {
                 host: `history`,
                 path: `/videos`,
@@ -103,11 +140,21 @@ function setupHandlers(app) {
 
                 response.on("end", () => {
                     // Renders the history for display in the browser.
-                    res.render("history", { videos: JSON.parse(data).videos });
+                    const ads = http.request();
+                    res.render("history", { videos: JSON.parse(data).videos, advertising: JSON.parse(ads)});
                 });
 
                 response.on("error", err => {
                     console.error("Failed to get history.");
+                    console.error(err || `Status code: ${response.statusCode}`);
+                    res.sendStatus(500);
+                });
+            }
+        ).end();
+                });
+
+                response.on("error", err => {
+                    console.error("Failed to get video list.");
                     console.error(err || `Status code: ${response.statusCode}`);
                     res.sendStatus(500);
                 });
@@ -154,6 +201,57 @@ function setupHandlers(app) {
         );
         
         req.pipe(forwardRequest);
+    });
+
+    app.get("/ads", (req, res) => {
+        http.request( 
+            {
+                host: `video-advertising`,
+                path: `/`,
+                method: `GET`,
+            },
+            (response) => {
+                let ads = "";
+                response.on("data", chunk => {
+                    ads += chunk;
+                });
+
+                response.on("end", () => {
+                    // Renders the video list for display in the browser.
+                    http.request( // Gets the viewing history from the history microservice.
+            {
+                host: `history`,
+                path: `/videos`,
+                method: `GET`,
+            },
+            (response) => {
+                let data = "";
+                response.on("data", chunk => {
+                    data += chunk;
+                });
+
+                response.on("end", () => {
+                    // Renders the history for display in the browser.
+                    const ads = http.request();
+                    res.render("history", { videos: JSON.parse(data).videos, advertising: JSON.parse(data)});
+                });
+
+                response.on("error", err => {
+                    console.error("Failed to get history.");
+                    console.error(err || `Status code: ${response.statusCode}`);
+                    res.sendStatus(500);
+                });
+            }
+        ).end();
+                });
+
+                response.on("error", err => {
+                    console.error("Failed to get video list.");
+                    console.error(err || `Status code: ${response.statusCode}`);
+                    res.sendStatus(500);
+                });
+            }
+        ).end();
     });
 }
 

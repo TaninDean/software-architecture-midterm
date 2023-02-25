@@ -49,5 +49,19 @@
                 </div>
             </div>
         </div>
+        <div>
+            <h1>Advertising</h1>
+            <div class="m-4">
+	            {{#if advertising}}
+                        {{#each advertising}}
+                            <div class="mt-1">
+                                 <a href="{{this.url}}">{{this.name}}</a> 
+                            </div>
+                        {{/each}}
+                    {{else}}
+                        No Ads.
+                    {{/if}}
+            </div>
+        </div>
     </body>
 </html>

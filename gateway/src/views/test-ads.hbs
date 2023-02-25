@@ -29,12 +29,17 @@
         </div>
 
         <div class="m-4">
-            <h1>Playing {{video.metadata.name}}</h1>
             <div class="m-4">
-	            <video controls autoplay muted>
-	                <source src={{video.url}} type="video/mp4">
-	                Your browser does not support the video tag.
-	            </video>
+	            {{#if videos}}
+                        {{#each videos}}
+                            <div class="mt-1">
+                                <h1>{{this.url}}</h1> 
+                                <h1>{{this.name}}</h1> 
+                            </div>
+                        {{/each}}
+                    {{else}}
+                        No videos uploaded yet.
+                    {{/if}}
             </div>
         </div>
 
