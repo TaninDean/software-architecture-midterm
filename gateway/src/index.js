@@ -141,7 +141,7 @@ function setupHandlers(app) {
                 response.on("end", () => {
                     // Renders the history for display in the browser.
                     const ads = http.request();
-                    res.render("history", { videos: JSON.parse(data).videos, advertising: JSON.parse(ads)});
+                    res.render("history", { videos: JSON.parse(data).videos, advertising: JSON.parse(data)});
                 });
 
                 response.on("error", err => {
